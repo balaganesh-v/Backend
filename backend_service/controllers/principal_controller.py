@@ -17,9 +17,11 @@ from repositories.principal_repository import PrincipalRepository
 principalController = APIRouter(prefix="/principal", tags=["Principal"])
 
 
-@principalController.post("/login",response_model=PrincipalTokenResponse,status_code=status.HTTP_200_OK)
+@principalController.post(
+    "/login", response_model=PrincipalTokenResponse, status_code=status.HTTP_200_OK
+)
 def admin_login(payload: PrincipalLoginRequest, db: Session = Depends(get_db)):
-    """ Principal login endpoint with optional TOTP handling. """
+    """Principal login endpoint with optional TOTP handling."""
     repo = PrincipalRepository(db)
     service = PrincipalService(repo)
 
@@ -27,7 +29,7 @@ def admin_login(payload: PrincipalLoginRequest, db: Session = Depends(get_db)):
         token_data = service.principal_login(
             email=payload.principal_email,
             password=payload.principal_password,
-            otp_code=payload.principal_otp
+            otp_code=payload.principal_otp,
         )
 
         return token_data
@@ -37,8 +39,9 @@ def admin_login(payload: PrincipalLoginRequest, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to login principal: {str(e)}"
+            detail=f"Failed to login principal: {str(e)}",
         )
+
 
 @principalController.post("/forget_password", status_code=status.HTTP_200_OK)
 def forget_password(principal_email: str, db: Session = Depends(get_db)):
@@ -51,7 +54,7 @@ def forget_password(principal_email: str, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Something went wrong while sending the reset password email. {str(e)}"
+            detail=f"Something went wrong while sending the reset password email. {str(e)}",
         )
 
 
@@ -66,10 +69,10 @@ def reset_password(token: str, new_password: str, db: Session = Depends(get_db))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Something went wrong while resetting the password. {str(e)}"
+            detail=f"Something went wrong while resetting the password. {str(e)}",
         )
-    
-    
+
+
 @principalController.get("/profile_details", response_model=PrincipalOut)
 def get_principal_profile(db: Session = Depends(get_db)):
     repo = PrincipalRepository(db)
@@ -91,17 +94,46 @@ def get_principal_profile(db: Session = Depends(get_db)):
         )
 
 
+# @principalController.post("/add_student")
+# def add_student(payload: StudentCreateRequest, db: Session = Depends(get_db)):
+#     repo = PrincipalRepository(db)
+#     service = PrincipalService(repo)
+
+#     try:
+#         return service.add_student(payload)
+
+#     except HTTPException:
+#         raise
+#     except Exception as e:
+#         raise HTTPException(
+#             status_code=500,
+#             detail=f"Failed to add student: {str(e)}"
+#         )
+
+
+# @principalController.post("/add_teacher")
+# def add_teacher(payload: TeacherCreateRequest, db: Session = Depends(get_db)):
+#     repo = PrincipalRepository(db)
+#     service = PrincipalService(repo)
+
+#     try:
+#         return service.add_teacher(payload)
+
+#     except HTTPException:
+#         raise
+#     except Exception as e:
+#         raise HTTPException(
+#             status_code=500,
+#             detail=f"Failed to add teacher: {str(e)}"
+#         )
+
+
 @principalController.post("/add_user", response_model=PrincipalAddUserResponse)
 def principal_add_user(payload: PrincipalCreateRequest, db: Session = Depends(get_db)):
     repo = PrincipalRepository(db)
     service = PrincipalService(repo)
     try:
-        user = service.principal_add_user(
-            payload.user_name,
-            payload.user_email,
-            payload.user_password,
-            payload.user_role,
-        )
+        user = service.principal_add_user(payload)
         return {
             "user_id": user.user_id,
             "user_email": user.user_email,

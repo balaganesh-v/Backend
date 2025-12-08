@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 from models import User, Principal, Teacher, Student
 import uuid
-import pyotp
+
 
 class PrincipalRepository:
     def __init__(self, db: Session = None):
@@ -34,21 +34,18 @@ class PrincipalRepository:
             return None
 
     def get_principal_by_user_id(self, user_id: str) -> Principal | None:
-        return (
-            self.db.query(Principal)
-            .filter(Principal.user_id == user_id)
-            .first()
-        )
+        return self.db.query(Principal).filter(Principal.user_id == user_id).first()
 
-    def add_user(self, user_name, user_email, hashed_password, user_role) -> User:
-        totp_secret = pyotp.random_base32()
+    def add_user(
+        self, user_name, user_email, hashed_password, user_role, user_totp_secret
+    ):
         user = User(
             user_id=str(uuid.uuid4()),
             user_name=user_name,
             user_email=user_email,
             user_password=hashed_password,
             user_role=user_role,
-            totp_secret=totp_secret,
+            totp_secret=user_totp_secret,
         )
         self.db.add(user)
         self.db.commit()
@@ -57,7 +54,7 @@ class PrincipalRepository:
 
     def add_teacher(self, user: User) -> Teacher:
         teacher = Teacher(
-            teacher_id=user.user_id,
+            user_id=user.user_id,
             teacher_name=user.user_name,
             teacher_email=user.user_email,
         )
@@ -68,7 +65,7 @@ class PrincipalRepository:
 
     def add_principal(self, user: User) -> Principal:
         principal = Principal(
-            principal_id=user.user_id,
+            user_id=user.user_id,
             principal_name=user.user_name,
             principal_email=user.user_email,
         )
@@ -77,11 +74,12 @@ class PrincipalRepository:
         self.db.refresh(principal)
         return principal
 
-    def add_student(self, user: User) -> Student:
+    def add_student(self, user: User, student_class: str | None = None) -> Student:
         student = Student(
             student_id=user.user_id,
             student_name=user.user_name,
             student_email=user.user_email,
+            student_class=student_class,  # store class in DB
         )
         self.db.add(student)
         self.db.commit()

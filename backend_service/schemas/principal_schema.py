@@ -25,9 +25,10 @@ class PrincipalLoginRequest(BaseModel):
 
 class PrincipalCreateRequest(BaseModel):
     user_name: str
-    user_email: EmailStr
+    user_email: str
     user_password: str
     user_role: str
+    user_class: Optional[str] = None
 
 
 class PrincipalUpdateRequest(BaseModel):
