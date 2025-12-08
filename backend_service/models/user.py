@@ -2,6 +2,7 @@ from sqlalchemy import Column, String, Enum, TIMESTAMP, func
 from sqlalchemy.orm import relationship
 from models import Base
 
+
 class User(Base):
     __tablename__ = "users"
 
@@ -10,10 +11,15 @@ class User(Base):
     user_email = Column(String(70), nullable=False, unique=True, index=True)
     user_password = Column(String(255), nullable=False)
     user_role = Column(Enum("Principal", "Teacher", "Student"), nullable=False)
-    user_totp_secret = Column(String(32), nullable=True)
-    user_created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
-    user_updated_at = Column(TIMESTAMP, server_default=func.current_timestamp(), onupdate=func.current_timestamp())
-    
+    totp_secret = Column(String(32), nullable=True)
+
+    created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
+    updated_at = Column(
+        TIMESTAMP,
+        server_default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+    )
+
     student = relationship("Student", back_populates="user", uselist=False)
     teacher = relationship("Teacher", back_populates="user", uselist=False)
     principal = relationship("Principal", back_populates="user", uselist=False)
