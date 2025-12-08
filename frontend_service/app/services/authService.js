@@ -1,9 +1,9 @@
-// Direct API calls for authentication
 const AUTH_API = "http://localhost:8000/principal";
 
-export async function login(payload) {
+// Generic POST request helper
+async function postRequest(endpoint, payload) {
   try {
-    const response = await fetch(`${AUTH_API}/login`, {
+    const response = await fetch(`${AUTH_API}/${endpoint}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -11,46 +11,31 @@ export async function login(payload) {
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) throw new Error("Login failed");
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Request failed");
+    }
+
     return await response.json();
   } catch (error) {
-    console.error("Login Error:", error);
+    console.error(`${endpoint} Error:`, error);
     throw error;
   }
 }
 
-export async function forgetPassword(email) {
-  try {
-    const response = await fetch(`${AUTH_API}/forget_password`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ principal_email: email }),
-    });
-
-    if (!response.ok) throw new Error("Forget password failed");
-    return await response.json();
-  } catch (error) {
-    console.error("Forget Password Error:", error);
-    throw error;
-  }
+// Now your service functions are much shorter:
+export function login(payload) {
+  return postRequest("login", payload);
 }
 
-export async function resetPassword(payload) {
-  try {
-    const response = await fetch(`${AUTH_API}/reset_password`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload), // { token, new_password }
-    });
+export function forgetPassword(email) {
+  return postRequest("forget_password", { principal_email: email });
+}
 
-    if (!response.ok) throw new Error("Reset password failed");
-    return await response.json();
-  } catch (error) {
-    console.error("Reset Password Error:", error);
-    throw error;
-  }
+export function resetPassword(payload) {
+  return postRequest("reset_password", payload); // { token, new_password }
+}
+
+export function addUserService(payload) {
+  return postRequest("add_user", payload); // { user_name, user_email, user_password, user_role, user_class? }
 }
