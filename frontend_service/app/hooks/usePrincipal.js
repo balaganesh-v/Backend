@@ -1,29 +1,25 @@
-// src/hooks/usePrincipal.js
 import { useState, useEffect } from "react";
 import { principalService } from "../services/principalService";
 
-export const usePrincipal = () => {
+export const usePrincipalData = () => {
     const [profile, setProfile] = useState(null);
     const [teachers, setTeachers] = useState([]);
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // ================================
-    // Load All Data in Parallel
-    // ================================
     const loadInitialData = async () => {
         setLoading(true);
         try {
-            const [profileData, teachersData, studentsData] = await Promise.all([
+            const [p, t, s] = await Promise.all([
                 principalService.getProfile(),
                 principalService.getTeachers(),
                 principalService.getStudents(),
             ]);
 
-            setProfile(profileData);
-            setTeachers(teachersData);
-            setStudents(studentsData);
+            setProfile(p);
+            setTeachers(t);
+            setStudents(s);
         } catch (err) {
             setError(err.response?.data?.detail || err.message);
         } finally {
@@ -31,9 +27,6 @@ export const usePrincipal = () => {
         }
     };
 
-    // ================================
-    // Refresh Individual Lists
-    // ================================
     const fetchTeachers = async () => {
         try {
             const data = await principalService.getTeachers();
@@ -52,9 +45,6 @@ export const usePrincipal = () => {
         }
     };
 
-    // ================================
-    // Update Principal Profile
-    // ================================
     const updateProfile = async (payload) => {
         setLoading(true);
         try {
@@ -69,15 +59,11 @@ export const usePrincipal = () => {
         }
     };
 
-    // ================================
-    // Add User (Teacher or Student)
-    // ================================
     const addUser = async (payload) => {
         setLoading(true);
         try {
             const data = await principalService.addUser(payload);
 
-            // Refresh correct list
             if (payload.user_role === "teacher") await fetchTeachers();
             if (payload.user_role === "student") await fetchStudents();
 
@@ -90,9 +76,6 @@ export const usePrincipal = () => {
         }
     };
 
-    // ================================
-    // Load All Data on Mount
-    // ================================
     useEffect(() => {
         loadInitialData();
     }, []);

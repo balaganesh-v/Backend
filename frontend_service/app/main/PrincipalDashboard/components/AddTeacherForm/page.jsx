@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { usePrincipal } from "@/context/PrincipalContext";
+import { addTeacher } from "@/services/principalService";
 
 export default function AddTeacherForm() {
-    const { teachers } = usePrincipal();
+
+    const [loading, setLoading] = useState(false);
 
     const [form, setForm] = useState({
         teacher_user_name: "",
@@ -21,13 +22,49 @@ export default function AddTeacherForm() {
         teacher_class_ids: ""
     });
 
-    const handleChange = (e) =>
+    const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await teachers.addTeacher(form);
-        alert("Teacher added successfully!");
+        setLoading(true);
+
+        try {
+            // Convert comma-separated "1,2,3" into array [1,2,3]
+            const payload = {
+                ...form,
+                teacher_class_ids: form.teacher_class_ids
+                    ? form.teacher_class_ids.split(",").map(id => id.trim())
+                    : []
+            };
+
+            const result = await addTeacher(payload);
+
+            alert(`Teacher added successfully! Teacher ID: ${result.teacher_id}`);
+
+            // Reset the form after submit
+            setForm({
+                teacher_user_name: "",
+                teacher_image_url: "",
+                teacher_gender: "Male",
+                teacher_qualification: "",
+                teacher_age: "",
+                teacher_year_of_experience: "",
+                teacher_subject_specialization: "",
+                teacher_salary_package: "",
+                teacher_mobile_number: "",
+                teacher_address: "",
+                teacher_bank_account_id: "",
+                teacher_class_ids: ""
+            });
+
+        } catch (err) {
+            console.error(err);
+            alert("Failed to add teacher.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -41,42 +78,39 @@ export default function AddTeacherForm() {
 
                 {/* Teacher Name */}
                 <div className="flex flex-col">
-                    <label htmlFor="teacher_user_name" className="mb-2 font-medium text-gray-700">
+                    <label className="mb-2 font-medium text-gray-700">
                         Teacher Name
                     </label>
                     <input
-                        id="teacher_user_name"
                         name="teacher_user_name"
+                        value={form.teacher_user_name}
                         placeholder="Enter teacher name"
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onChange={handleChange}
+                        className="border border-gray-300 rounded-md p-2"
+                        required
                     />
                 </div>
 
                 {/* Image URL */}
                 <div className="flex flex-col">
-                    <label htmlFor="teacher_image_url" className="mb-2 font-medium text-gray-700">
-                        Image URL
-                    </label>
+                    <label className="mb-2 font-medium text-gray-700">Image URL</label>
                     <input
-                        id="teacher_image_url"
                         name="teacher_image_url"
+                        value={form.teacher_image_url}
                         placeholder="Enter image URL"
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onChange={handleChange}
+                        className="border border-gray-300 rounded-md p-2"
                     />
                 </div>
 
                 {/* Gender */}
                 <div className="flex flex-col">
-                    <label htmlFor="teacher_gender" className="mb-2 font-medium text-gray-700">
-                        Gender
-                    </label>
+                    <label className="mb-2 font-medium text-gray-700">Gender</label>
                     <select
-                        id="teacher_gender"
                         name="teacher_gender"
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={form.teacher_gender}
                         onChange={handleChange}
+                        className="border border-gray-300 rounded-md p-2"
                     >
                         <option>Male</option>
                         <option>Female</option>
@@ -86,130 +120,126 @@ export default function AddTeacherForm() {
 
                 {/* Qualification */}
                 <div className="flex flex-col">
-                    <label htmlFor="teacher_qualification" className="mb-2 font-medium text-gray-700">
+                    <label className="mb-2 font-medium text-gray-700">
                         Qualification
                     </label>
                     <input
-                        id="teacher_qualification"
                         name="teacher_qualification"
+                        value={form.teacher_qualification}
                         placeholder="Enter qualification"
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onChange={handleChange}
+                        className="border border-gray-300 rounded-md p-2"
                     />
                 </div>
 
                 {/* Age */}
                 <div className="flex flex-col">
-                    <label htmlFor="teacher_age" className="mb-2 font-medium text-gray-700">
-                        Age
-                    </label>
+                    <label className="mb-2 font-medium text-gray-700">Age</label>
                     <input
-                        id="teacher_age"
                         name="teacher_age"
+                        value={form.teacher_age}
                         placeholder="Enter age"
                         type="number"
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onChange={handleChange}
+                        className="border border-gray-300 rounded-md p-2"
                     />
                 </div>
 
-                {/* Years of Experience */}
+                {/* Experience */}
                 <div className="flex flex-col">
-                    <label htmlFor="teacher_year_of_experience" className="mb-2 font-medium text-gray-700">
+                    <label className="mb-2 font-medium text-gray-700">
                         Experience (Years)
                     </label>
                     <input
-                        id="teacher_year_of_experience"
                         name="teacher_year_of_experience"
+                        value={form.teacher_year_of_experience}
                         placeholder="Enter years of experience"
                         type="number"
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onChange={handleChange}
+                        className="border border-gray-300 rounded-md p-2"
                     />
                 </div>
 
                 {/* Subject Specialization */}
                 <div className="flex flex-col">
-                    <label htmlFor="teacher_subject_specialization" className="mb-2 font-medium text-gray-700">
+                    <label className="mb-2 font-medium text-gray-700">
                         Subject Specialization
                     </label>
                     <input
-                        id="teacher_subject_specialization"
                         name="teacher_subject_specialization"
+                        value={form.teacher_subject_specialization}
                         placeholder="Enter subject specialization"
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onChange={handleChange}
+                        className="border border-gray-300 rounded-md p-2"
                     />
                 </div>
 
-                {/* Salary Package */}
+                {/* Salary */}
                 <div className="flex flex-col">
-                    <label htmlFor="teacher_salary_package" className="mb-2 font-medium text-gray-700">
+                    <label className="mb-2 font-medium text-gray-700">
                         Salary Package
                     </label>
                     <input
-                        id="teacher_salary_package"
                         name="teacher_salary_package"
+                        value={form.teacher_salary_package}
                         placeholder="Enter salary package"
                         type="number"
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onChange={handleChange}
+                        className="border border-gray-300 rounded-md p-2"
                     />
                 </div>
 
                 {/* Mobile Number */}
                 <div className="flex flex-col">
-                    <label htmlFor="teacher_mobile_number" className="mb-2 font-medium text-gray-700">
+                    <label className="mb-2 font-medium text-gray-700">
                         Mobile Number
                     </label>
                     <input
-                        id="teacher_mobile_number"
                         name="teacher_mobile_number"
+                        value={form.teacher_mobile_number}
                         placeholder="Enter mobile number"
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onChange={handleChange}
+                        className="border border-gray-300 rounded-md p-2"
                     />
                 </div>
 
                 {/* Address */}
                 <div className="flex flex-col md:col-span-2">
-                    <label htmlFor="teacher_address" className="mb-2 font-medium text-gray-700">
-                        Address
-                    </label>
+                    <label className="mb-2 font-medium text-gray-700">Address</label>
                     <textarea
-                        id="teacher_address"
                         name="teacher_address"
+                        value={form.teacher_address}
                         placeholder="Enter address"
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onChange={handleChange}
-                    ></textarea>
+                        className="border border-gray-300 rounded-md p-2"
+                    />
                 </div>
 
                 {/* Bank Account ID */}
                 <div className="flex flex-col">
-                    <label htmlFor="teacher_bank_account_id" className="mb-2 font-medium text-gray-700">
+                    <label className="mb-2 font-medium text-gray-700">
                         Bank Account ID
                     </label>
                     <input
-                        id="teacher_bank_account_id"
                         name="teacher_bank_account_id"
+                        value={form.teacher_bank_account_id}
                         placeholder="Enter bank account ID"
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onChange={handleChange}
+                        className="border border-gray-300 rounded-md p-2"
                     />
                 </div>
 
                 {/* Class IDs */}
                 <div className="flex flex-col">
-                    <label htmlFor="teacher_class_ids" className="mb-2 font-medium text-gray-700">
+                    <label className="mb-2 font-medium text-gray-700">
                         Class IDs (comma-separated)
                     </label>
                     <input
-                        id="teacher_class_ids"
                         name="teacher_class_ids"
+                        value={form.teacher_class_ids}
                         placeholder="e.g. 1,2,3"
-                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onChange={handleChange}
+                        className="border border-gray-300 rounded-md p-2"
                     />
                 </div>
 
@@ -217,9 +247,10 @@ export default function AddTeacherForm() {
 
             <button
                 type="submit"
-                className="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors"
+                className="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg"
+                disabled={loading}
             >
-                Submit
+                {loading ? "Submitting..." : "Submit"}
             </button>
         </form>
     );

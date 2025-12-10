@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { addUserService } from "@/services/authService";
+import { addUser } from "@/services/principalService";
 
 export default function AddUserForm() {
     const [form, setForm] = useState({
@@ -26,7 +26,7 @@ export default function AddUserForm() {
             const payload = { ...form };
             if (form.user_role !== "student") delete payload.user_class;
 
-            const result = await addUserService(payload);
+            const result = await addUser(payload);
             alert(`User added successfully! User ID: ${result.user_id}`);
             
             setForm({

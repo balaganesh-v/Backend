@@ -1,17 +1,15 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
-import useTeachers from "../hooks/useTeacher";
-import useStudents from "../hooks/useStudent";
+import { createContext, useContext } from "react";
+import { usePrincipalData } from "../hooks/usePrincipal";
 
-const PrincipalContext = createContext();
+const PrincipalContext = createContext(null);
 
 export function PrincipalProvider({ children }) {
-    const teachers = useTeachers();
-    const students = useStudents();
+    const principal = usePrincipalData(); // load all state and actions
 
     return (
-        <PrincipalContext.Provider value={{ teachers, students }}>
+        <PrincipalContext.Provider value={principal}>
             {children}
         </PrincipalContext.Provider>
     );
