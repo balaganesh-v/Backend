@@ -76,7 +76,7 @@ class PrincipalRepository:
 
     def add_student(self, user: User, student_class: str | None = None) -> Student:
         student = Student(
-            student_id=user.user_id,
+            User_id=user.user_id,
             student_name=user.user_name,
             student_email=user.user_email,
             student_class=student_class,  # store class in DB

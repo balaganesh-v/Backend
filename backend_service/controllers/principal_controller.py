@@ -135,9 +135,10 @@ def principal_add_user(payload: PrincipalCreateRequest, db: Session = Depends(ge
     try:
         user = service.principal_add_user(payload)
         return {
+            "message": "User created successfully. Verification email sent.",
             "user_id": user.user_id,
             "user_email": user.user_email,
-            "totp_secret": user.user_totp_secret,
+            "totp_secret": user.totp_secret,
         }
     except HTTPException:
         raise

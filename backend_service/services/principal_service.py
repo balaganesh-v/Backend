@@ -12,7 +12,7 @@ from core.security import (
     hash_password,
     decode_access_token,
 )
-from core.mail import send_add_user_email, send_reset_password_email
+from core.mail import send_reset_password_email, send_welcome_email, send_principal_welcome_email
 
 
 class PrincipalService:
@@ -143,7 +143,7 @@ class PrincipalService:
 
     def principal_add_user(self, payload: PrincipalCreateRequest):
         try:
-            # Extract fields from payload
+            # Extract fields
             user_name = payload.user_name
             user_email = payload.user_email
             password = payload.user_password
@@ -152,9 +152,9 @@ class PrincipalService:
 
             # Hash password
             hashed_password = hash_password(password)
-
             user_totp_secret = generate_secret()
-            # Add user in User table
+
+            # Add user
             user = self.repo.add_user(
                 user_name, user_email, hashed_password, user_role, user_totp_secret
             )
@@ -163,13 +163,13 @@ class PrincipalService:
             role_lower = user_role.lower()
             if role_lower == "teacher":
                 self.repo.add_teacher(user)
+                send_welcome_email(user_email, user_name, password, user_role)
             elif role_lower == "principal":
                 self.repo.add_principal(user)
+                send_principal_welcome_email(user_email, user_name, password, user_role, user_totp_secret)
             elif role_lower == "student":
                 self.repo.add_student(user, user_class)
-
-            # Send welcome email
-            send_add_user_email(user_email, user_name, password, user_role)
+                send_welcome_email(user_email, user_name, password, user_role)
 
             return user
         except HTTPException:
@@ -179,6 +179,7 @@ class PrincipalService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Internal server error: {str(e)}",
             )
+
 
     def fetch_all_teachers(self):
         try:
