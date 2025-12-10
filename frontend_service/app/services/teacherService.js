@@ -1,37 +1,37 @@
-// Direct API calls for teachers
 const TEACHER_API = "http://localhost:8000/principal";
 
-export async function getAllTeachers() {
+// Generic request helper
+async function teacherRequest(endpoint, method = "GET", payload = null) {
     try {
-        const response = await fetch(`${TEACHER_API}/teachers`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+        const options = {
+            method,
+            headers: { "Content-Type": "application/json" },
+        };
 
-        if (!response.ok) throw new Error("Failed to fetch teachers");
+        if (payload) options.body = JSON.stringify(payload);
+
+        const response = await fetch(`${TEACHER_API}/${endpoint}`, options);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || "Request failed");
+        }
+
         return await response.json();
     } catch (error) {
-        console.error("Get Teachers Error:", error);
+        console.error(`${method} ${endpoint} Error:`, error);
         throw error;
     }
 }
 
-export async function addTeacher(payload) {
-    try {
-        const response = await fetch(`${TEACHER_API}/add_teacher`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-        });
+// ==================== Teacher API ====================
 
-        if (!response.ok) throw new Error("Failed to add teacher");
-        return await response.json();
-    } catch (error) {
-        console.error("Add Teacher Error:", error);
-        throw error;
-    }
-}
+export const getAllTeachers = () => teacherRequest("teachers", "GET");
+
+export const getTeacherById = (id) => teacherRequest(`teacher/${id}`, "GET");
+
+export const addTeacher = (payload) => teacherRequest("add_teacher", "POST", payload);
+
+export const updateTeacher = (id, payload) => teacherRequest(`update_teacher/${id}`, "PUT", payload);
+
+export const deleteTeacher = (id) => teacherRequest(`delete_teacher/${id}`, "DELETE");
