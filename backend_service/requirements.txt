@@ -1,9 +1,0 @@
-fastapi
-uvicorn
-sqlalchemy
-pydantic
-pyotp
-python-jose
-email-validator
-passlib
-cloudinary
