@@ -1,16 +1,18 @@
-import '@/styles/globals.css'
-import Providers from '@/providers/Providers'
+import './styles/globals.css';
+import MainLayout from './main/MainLayout';
 
 export const metadata = {
-  title: 'School Management',
-}
+  title: 'Yuhnie ❤️!!'
+};
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <MainLayout>
+          {children}
+        </MainLayout>
       </body>
     </html>
-  )
+  );
 }

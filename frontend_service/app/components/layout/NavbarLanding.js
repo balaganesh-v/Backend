@@ -1,13 +1,15 @@
+"use client"; // Needed because we use useState
+
 import React, { useState } from "react";
 import Link from "next/link";
 
-export default function Navbar(props) {
+function Navbar(props) {
   const [open, setOpen] = useState(false);
 
   return (
     <nav className="bg-white px-4 sm:px-6 lg:px-8 py-4 shadow fixed top-0 left-0 right-0 z-50">
       <div className="px-4 py-2 flex justify-between items-center">
-        
+
         {/* Logo */}
         <Link
           href="/"
@@ -19,27 +21,28 @@ export default function Navbar(props) {
         {/* Desktop Links */}
         <div className="hidden md:flex space-x-8">
           <span className="text-gray-700 font-medium">
-            Welcome, {props.username || "Guest"}!
+            Welcome, {props.username || "yuhnie"}
           </span>
 
           <Link href="/" className="text-gray-600 hover:text-blue-600 text-base font-medium transition">
             Home
           </Link>
 
-          <Link href="/dashboard/principal" className="text-gray-600 hover:text-blue-600 text-base font-medium transition">
+          {/* Navigate to Principal Dashboard page */}
+          <Link href="/main/PrincipalDashboard" className="text-gray-600 hover:text-blue-600 text-base font-medium transition">
             Principal Dashboard
           </Link>
 
-          <Link href="#about" className="text-gray-600 hover:text-blue-600 text-base font-medium transition">
+          <Link href="/#about" className="text-gray-600 hover:text-blue-600 text-base font-medium transition">
             About
           </Link>
-          <Link href="#features" className="text-gray-600 hover:text-blue-600 text-base font-medium transition">
+          <Link href="/#features" className="text-gray-600 hover:text-blue-600 text-base font-medium transition">
             Features
           </Link>
-          <Link href="#pricing" className="text-gray-600 hover:text-blue-600 text-base font-medium transition">
+          <Link href="/#pricing" className="text-gray-600 hover:text-blue-600 text-base font-medium transition">
             Pricing
           </Link>
-          <Link href="#contact" className="text-gray-600 hover:text-blue-600 text-base font-medium transition">
+          <Link href="/#contact" className="text-gray-600 hover:text-blue-600 text-base font-medium transition">
             Contact
           </Link>
         </div>
@@ -47,7 +50,7 @@ export default function Navbar(props) {
         {/* CTA Button */}
         <div className="hidden md:block">
           <Link
-            href="#login"
+            href="/login"
             className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200"
           >
             Get Started
@@ -74,20 +77,20 @@ export default function Navbar(props) {
             Home
           </Link>
 
-          <Link href="/dashboard/principal" className="block px-4 py-3 border-b text-gray-600 hover:text-blue-600 hover:bg-gray-50 text-base font-medium">
+          <Link href="/main/PrincipalDashboard" className="block px-4 py-3 border-b text-gray-600 hover:text-blue-600 hover:bg-gray-50 text-base font-medium">
             Principal Dashboard
           </Link>
 
-          <Link href="#about" className="block px-4 py-3 border-b text-gray-600 hover:text-blue-600 hover:bg-gray-50 text-base font-medium">
+          <Link href="/#about" className="block px-4 py-3 border-b text-gray-600 hover:text-blue-600 hover:bg-gray-50 text-base font-medium">
             About
           </Link>
-          <Link href="#features" className="block px-4 py-3 border-b text-gray-600 hover:text-blue-600 hover:bg-gray-50 text-base font-medium">
+          <Link href="/#features" className="block px-4 py-3 border-b text-gray-600 hover:text-blue-600 hover:bg-gray-50 text-base font-medium">
             Features
           </Link>
-          <Link href="#pricing" className="block px-4 py-3 border-b text-gray-600 hover:text-blue-600 hover:bg-gray-50 text-base font-medium">
+          <Link href="/#pricing" className="block px-4 py-3 border-b text-gray-600 hover:text-blue-600 hover:bg-gray-50 text-base font-medium">
             Pricing
           </Link>
-          <Link href="#contact" className="block px-4 py-3 border-b text-gray-600 hover:text-blue-600 hover:bg-gray-50 text-base font-medium">
+          <Link href="/#contact" className="block px-4 py-3 border-b text-gray-600 hover:text-blue-600 hover:bg-gray-50 text-base font-medium">
             Contact
           </Link>
 
@@ -104,3 +107,5 @@ export default function Navbar(props) {
     </nav>
   );
 }
+
+export default Navbar;

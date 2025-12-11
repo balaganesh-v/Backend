@@ -1,59 +1,50 @@
-import axios from "axios";
-import { USE_MOCK_API } from "../config";
-import { principalMockAPI } from "./principalMock";
+const AUTH_API = "http://localhost:8000/principal";
 
-const API_BASE = "http://localhost:8000/principal";
-
-export const principalService = {
-    login: async (payload) => {
-        if (USE_MOCK_API) return { access_token: "mock-token", token_type: "bearer" };
-        const response = await axios.post(`${API_BASE}/login`, payload);
-        return response.data;
-    },
-
-    forgetPassword: async (principal_email) => {
-        if (USE_MOCK_API) return { ok: true };
-        const response = await axios.post(`${API_BASE}/forget_password`, null, {
-            params: { principal_email },
+// Generic POST request helper
+async function postRequest(endpoint, payload) {
+    try {
+        const response = await fetch(`${AUTH_API}/${endpoint}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
         });
-        return response.data;
-    },
 
-    resetPassword: async (token, new_password) => {
-        if (USE_MOCK_API) return { ok: true };
-        const response = await axios.post(`${API_BASE}/reset_password`, null, {
-            params: { token, new_password },
-        });
-        return response.data;
-    },
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || "Request failed");
+        }
 
-    getProfile: async () => {
-        if (USE_MOCK_API) return principalMockAPI.getProfile();
-        const response = await axios.get(`${API_BASE}/profile_details`);
-        return response.data;
-    },
+        return await response.json();
+    } catch (error) {
+        console.error(`${endpoint} Error:`, error);
+        throw error;
+    }
+}
 
-    updateProfile: async (payload) => {
-        if (USE_MOCK_API) return principalMockAPI.updateProfile(payload);
-        const response = await axios.put(`${API_BASE}/update_profile`, payload);
-        return response.data;
-    },
+// Auth + user services
+export function login(payload) {
+    return postRequest("login", payload);
+}
 
-    addUser: async (payload) => {
-        if (USE_MOCK_API) return principalMockAPI.addUser(payload);
-        const response = await axios.post(`${API_BASE}/add_user`, payload);
-        return response.data;
-    },
+export function forgetPassword(email) {
+    return postRequest("forget_password", { principal_email: email });
+}
 
-    getTeachers: async () => {
-        if (USE_MOCK_API) return principalMockAPI.getTeachers();
-        const response = await axios.get(`${API_BASE}/teachers`);
-        return response.data;
-    },
+export function resetPassword(payload) {
+    return postRequest("reset_password", payload);
+}
 
-    getStudents: async () => {
-        if (USE_MOCK_API) return principalMockAPI.getStudents();
-        const response = await axios.get(`${API_BASE}/students`);
-        return response.data;
-    },
-};
+export function addUser(payload) {
+    return postRequest("add_user", payload);
+}
+
+// Teacher service
+export function addTeacher(payload) {
+    return postRequest("add_teacher", payload);
+}
+
+export function addStudent(payload) {
+    return postRequest("add_student", payload);
+}

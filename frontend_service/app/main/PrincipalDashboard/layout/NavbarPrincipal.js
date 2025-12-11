@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function NavBarPrincipal({ onMenuClick }) {
+export default function Navbar({ onMenuClick }) {
     return (
         <nav className="w-full bg-white shadow px-6 py-4 flex justify-between items-center fixed top-0 left-0 right-0 z-30">
             <button

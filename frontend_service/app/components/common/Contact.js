@@ -1,3 +1,5 @@
+"use client";
+
 import Input from "@/components/common/Input";
 import React, { useState } from 'react';
 
