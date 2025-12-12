@@ -5,7 +5,9 @@ from jose import JWTError
 
 from repositories.principal_repository import PrincipalRepository
 from core.security import verify_password, create_access_token, hash_password , decode_access_token
-from core.mail import send_add_user_email, send_reset_password_email
+from core.mail import send_reset_password_email, send_welcome_email, send_principal_welcome_email
+from schemas.principal_schema import PrincipalCreateRequest
+from core.security import generate_secret
 
 
 class PrincipalService:
@@ -147,14 +149,18 @@ class PrincipalService:
                 detail=f"Internal server error: {str(e)}",
             )
 
-    def principal_add_user(self, user_name, user_email, password, user_role):
+    def principal_add_user(self, payload: PrincipalCreateRequest):
         try:
+            user_name = payload.user_name
+            user_email = payload.user_email
+            user_role = payload.user_role
+            password = payload.user_password
+            user_class = payload.user_class  # For students
+            
+            totp_secret = generate_secret()
+            
             # Hash password if not already hashed
-            hashed_password = (
-                verify_password(password, password)
-                if password.startswith("$2b$")
-                else hash_password(password)
-            )
+            hashed_password = hash_password(password)
 
             # Add user in User table
             user = self.repo.add_user(user_name, user_email, hashed_password, user_role)
@@ -162,13 +168,14 @@ class PrincipalService:
             # Role-specific inserts
             if user_role.lower() == "teacher":
                 self.repo.add_teacher(user)
+                send_welcome_email(user_email, user_name, password, user_role)
             elif user_role.lower() == "principal":
                 self.repo.add_principal(user)
+                send_principal_welcome_email(user_email, user_name, password, user_role, totp_secret)
             elif user_role.lower() == "student":
-                self.repo.add_student(user)
+                self.repo.add_student(user,user_class)
+                send_welcome_email(user_email, user_name, password, user_role)
 
-            # Send welcome email
-            send_add_user_email(user_email, user_name, password, user_role)
 
             return user
         except HTTPException:

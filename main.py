@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from config import settings
 from database import Base, engine
 from controllers.principal_controller import principalController 
-from controllers.student_controller import studentController
-from controllers.teacher_controller import teacherController
+# from controllers.student_controller import studentController
+# from controllers.teacher_controller import teacherController
 
 
 # Base = Function to create a base class for your ORM models
@@ -31,5 +31,5 @@ app.add_middleware(
 
 # Register admin router
 app.include_router(principalController)
-app.include_router(studentController)
-app.include_router(teacherController)
+# app.include_router(studentController)
+# app.include_router(teacherController)
